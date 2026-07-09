@@ -1,6 +1,9 @@
 #pragma once
 
-namespace frik::hook
+namespace frik_smooth_movement::hook
 {
-    void hookMain();
+    /**
+     * Install the hook on the game's dedicated smooth-movement call site.
+     */
+    void installSmoothMovementHook();
 }

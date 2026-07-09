@@ -4,7 +4,7 @@
 
 #include "common/CommonUtils.h"
 
-namespace frik
+namespace frik_smooth_movement
 {
     class SmoothMovementVR
     {
