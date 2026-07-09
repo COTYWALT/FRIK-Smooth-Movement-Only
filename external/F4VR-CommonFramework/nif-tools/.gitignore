@@ -1,0 +1,9 @@
+# Auto-fetched PyNifly runtime (GPL-3.0; downloaded by nif_to_json.py on first run)
+.pynifly/
+.cache/
+
+# Default JSON outputs
+*.nif.json
+
+# Python bytecode cache
+__pycache__/
