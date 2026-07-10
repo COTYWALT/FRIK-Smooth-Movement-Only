@@ -87,6 +87,8 @@ list(APPEND resource_files
   "${ROOT_DIR}/data/config/${NAME}.ini"
 )
 
+set(CONFIG_FILE "${ROOT_DIR}/data/config/${NAME}.ini")
+
 # >>> Target (DLL)
 add_library(${PROJECT_NAME} SHARED
   ${headers}
@@ -170,6 +172,13 @@ target_link_options(${PROJECT_NAME}
     "$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
 )
 
+add_custom_command(
+  TARGET ${PROJECT_NAME}
+  POST_BUILD
+  COMMENT "Copying ${NAME}.ini next to built plugin"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CONFIG_FILE} $<TARGET_FILE_DIR:${PROJECT_NAME}>/
+)
+
 # >>> fix a warning with /Ob2 being overridden with /Ob3
 string(REPLACE "/Ob2" "/Ob3" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -189,6 +198,7 @@ if(POST_BUILD_COPY_PLUGIN)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_path}/F4SE/Plugins/
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${copy_path}/F4SE/Plugins/
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> ${copy_path}/F4SE/Plugins/
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CONFIG_FILE} ${copy_path}/F4SE/Plugins/
       )
     endforeach()
   else()

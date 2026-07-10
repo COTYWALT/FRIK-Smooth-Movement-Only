@@ -20,11 +20,11 @@ same injection point FRIK uses, which is why the result matches FRIK's smoothing
 
 ## Config
 
-Settings live in a hot-reloadable INI, created automatically on first run from a copy embedded in
-the DLL:
+Settings live in a hot-reloadable INI beside the DLL. If the INI is deleted, it is recreated on
+the next run from the default embedded in the DLL:
 
 ```
-Documents\My Games\Fallout4VR\Mods_Config\FRIK-SmoothMovement\FRIK-SmoothMovement.ini
+Fallout4VR\Data\F4SE\Plugins\FRIK-SmoothMovement.ini
 ```
 
 Edit it while the game is running and the changes apply immediately — no restart. Keys (all under
@@ -39,12 +39,10 @@ the `[FRIK-SmoothMovement]` section):
 | `fDampingHorizontal`            | `1.0`   | Horizontal damping                                 |
 | `fStoppingMultiplierHorizontal` | `0.5`   | Horizontal smoothing while standing still          |
 
-The `[Debug]` section controls the log level/pattern (see the framework's
-[debug-config guide](external/F4VR-CommonFramework/docs/debug-config.md)).
-
 ## Logging
 
-The plugin writes a rotating `FRIK-SmoothMovement.log` in the standard Fallout 4 VR F4SE log folder:
+The plugin writes a single `FRIK-SmoothMovement.log` in the standard Fallout 4 VR F4SE log folder.
+The file is overwritten each time the plugin starts:
 
 ```
 Documents\My Games\Fallout4VR\F4SE\FRIK-SmoothMovement.log
