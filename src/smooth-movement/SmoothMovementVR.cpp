@@ -10,7 +10,7 @@ using namespace common;
 
 // Adapted from original code by Shizof mod with permission.  Thanks Shizof!!
 
-namespace frik
+namespace frik_smooth_movement
 {
     void SmoothMovementVR::onFrameUpdate()
     {
@@ -70,7 +70,6 @@ namespace frik
 
         // logger::sample("[SmoothMovement] curPos:({:.2f}, {:.2f}, {:.2f}), newPos:({:.2f}, {:.2f}, {:.2f}), appliedPos:({:.2f}, {:.2f}, {:.2f})",
         // 	curPos.x, curPos.y, curPos.z, newPos.x, newPos.y, newPos.z, playerLocalTransformPos.x, playerLocalTransformPos.y, playerLocalTransformPos.z);
-
     }
 
     /**

@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 4.2)
 
 
 # >>> Project
-set(NAME "FRIK")
-set(FRIENDLY_NAME "FRIK")
-set(VERSION 0.78.0)
+set(NAME "FRIK-SmoothMovement")
+set(FRIENDLY_NAME "FRIK Smooth Movement")
+set(VERSION 1.0.0)
 
 message(">>> Start build for '${NAME}' v${VERSION}")
 
@@ -47,7 +47,7 @@ else()
   message(">>> Using F4VR-CommonFramework in external: '${F4VR_COMMON_FRAMEWORK_PATH_SELECTED}'")
 endif()
 # Verify path is correct
-if(NOT EXISTS "${F4VR_COMMON_FRAMEWORK_PATH_SELECTED}/src/f4vr/F4VRUtils.h")
+if(NOT EXISTS "${F4VR_COMMON_FRAMEWORK_PATH_SELECTED}/src/ModBase.h")
   message(FATAL_ERROR ">> F4VR-CommonFramework path not found in '${F4VR_COMMON_FRAMEWORK_PATH_SELECTED}'!\n >> Did you init submodules? (git submodule update --init --recursive)\n >> or set F4VR_COMMON_FRAMEWORK_PATH?")
 endif()
 
@@ -73,32 +73,29 @@ add_subdirectory(${F4VR_COMMON_FRAMEWORK_PATH_SELECTED} "F4VR-CommonFramework" E
 # >>> Version & resource files
 configure_file(${ROOT_DIR}/cmake/version.rc.in  ${BUILD_DIR}/version.rc  @ONLY)
 configure_file(${ROOT_DIR}/cmake/Version.h.in   ${BUILD_DIR}/include/Version.h @ONLY)
-source_group(TREE ${BUILD_DIR} FILES ${BUILD_DIR}/include/Version.h)
+configure_file(${ROOT_DIR}/cmake/resources.rc.in ${BUILD_DIR}/resources.rc @ONLY)
+source_group(TREE ${BUILD_DIR} FILES ${BUILD_DIR}/include/Version.h ${BUILD_DIR}/resources.rc)
 
 # >>> Sources
-set(headers
-  "${SOURCE_DIR}/Config.h"
-  "${SOURCE_DIR}/FRIK.h"
-  "${SOURCE_DIR}/GameHooks.h"
-  "${SOURCE_DIR}/PCH.h"
-  "${SOURCE_DIR}/smooth-movement/SmoothMovementVR.h"
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS "${SOURCE_DIR}/*.h")
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${SOURCE_DIR}/*.cpp")
+file(GLOB_RECURSE inls    CONFIGURE_DEPENDS "${SOURCE_DIR}/*.inl")
+source_group(TREE ${ROOT_DIR} FILES ${headers} ${sources} ${inls})
+
+# >>> Resource files
+list(APPEND resource_files
+  "${ROOT_DIR}/data/config/${NAME}.ini"
 )
-set(sources
-  "${SOURCE_DIR}/Config.cpp"
-  "${SOURCE_DIR}/FRIK.cpp"
-  "${SOURCE_DIR}/GameHooks.cpp"
-  "${SOURCE_DIR}/smooth-movement/SmoothMovementVR.cpp"
-)
-set(inls)
-source_group(TREE ${ROOT_DIR} FILES ${headers} ${sources})
 
 # >>> Target (DLL)
 add_library(${PROJECT_NAME} SHARED
   ${headers}
   ${sources}
   ${inls}
+  ${resource_files}
   ${BUILD_DIR}/include/Version.h
   ${BUILD_DIR}/version.rc
+  ${BUILD_DIR}/resources.rc
   "${ROOT_DIR}/.clang-format"
   "${ROOT_DIR}/.editorconfig"
 )
@@ -201,5 +198,19 @@ else()
   message(">>> No post build copy")
 endif()
 
-# The full upstream packaging step copies ESPs, meshes, scripts, and other
-# resources. This smooth-only build installs just the F4SE plugin DLL manually.
+# >>> Post build for release only to package the mod into a .7z file
+message(">>> Create post build command: package mod on release build")
+add_custom_command(
+  TARGET ${PROJECT_NAME}
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND}
+          -DPROJECT_NAME=${PROJECT_NAME}
+          -DPROJECT_FRIENDLY_NAME=${FRIENDLY_NAME}
+          -DPROJECT_VERSION=${PROJECT_VERSION}
+          -DROOT_DIR=${ROOT_DIR}
+          -DBUILD_DIR=${BUILD_DIR}
+          -DTARGET_FILE="$<TARGET_FILE:${PROJECT_NAME}>"
+          -DTARGET_PDB_FILE="$<TARGET_PDB_FILE:${PROJECT_NAME}>"
+          -DCONFIG=$(Configuration)
+          -P "${ROOT_DIR}/cmake/package.cmake"
+)

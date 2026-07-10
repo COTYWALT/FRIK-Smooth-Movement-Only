@@ -1,5 +1,5 @@
 {
-  "name": "frik",
+  "name": "frik-smooth-movement",
   "version": "1",
   "dependencies": [
     "args",
